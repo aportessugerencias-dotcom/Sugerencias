@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Mail, KeyRound, ArrowRight, CheckCircle2 } from "lucide-react";
+import { supabase } from "@/lib/supabaseClient";
+import { Mail, KeyRound, ArrowRight } from "lucide-react";
 
 interface AuthGateProps {
     onVerified: (email: string) => void;
@@ -19,21 +20,24 @@ export function AuthGate({ onVerified }: AuthGateProps) {
         setLoading(true);
         setError("");
 
-        // Simulate API call
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            const { error } = await supabase.auth.signInWithOtp({
+                email,
+                options: {
+                    shouldCreateUser: true, // Allow new users to "sign up" this way
+                    // emailRedirectTo: ... (not strictly needed for OTP code flow but good practice)
+                }
+            });
 
-        // For demo purposes, we accept any email
-        if (!email.includes("@")) {
-            setError("Por favor ingresá un email válido");
+            if (error) throw error;
+
+            setStep("otp");
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || "Error al enviar el código. Intentalo de nuevo.");
+        } finally {
             setLoading(false);
-            return;
         }
-
-        setLoading(false);
-        setStep("otp");
-        // In a real app, we would send the email here
-        console.log(`Code sent to ${email}`);
-        alert(`Simulación: Tu código de verificación es 123456`);
     };
 
     const handleVerifyCode = async (e: React.FormEvent) => {
@@ -41,12 +45,26 @@ export function AuthGate({ onVerified }: AuthGateProps) {
         setLoading(true);
         setError("");
 
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        try {
+            const { error } = await supabase.auth.verifyOtp({
+                email,
+                token: otp,
+                type: 'email'
+            });
 
-        if (otp === "123456") {
+            if (error) {
+                if (error.message.includes("Token has expired") || error.message.includes("Invalid token")) {
+                    throw new Error("Código inválido o expirado.");
+                }
+                throw error;
+            }
+
+            // Success
             onVerified(email);
-        } else {
-            setError("Código incorrecto. Intentalo de nuevo.");
+        } catch (err: any) {
+            console.error(err);
+            setError(err.message || "Error al verificar el código.");
+        } finally {
             setLoading(false);
         }
     };
@@ -90,11 +108,11 @@ export function AuthGate({ onVerified }: AuthGateProps) {
                                 type="text"
                                 id="otp"
                                 required
-                                maxLength={6}
+                                maxLength={20}
                                 value={otp}
                                 onChange={(e) => setOtp(e.target.value)}
                                 className="w-full rounded-xl border border-gray-200 bg-white/50 px-4 py-3 text-center text-2xl font-bold tracking-widest text-gray-900 outline-none transition-all placeholder:text-gray-400 focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 placeholder:opacity-50"
-                                placeholder="000000"
+                                placeholder="123456..."
                             />
                             <button
                                 type="button"
