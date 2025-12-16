@@ -10,6 +10,7 @@ interface Area {
     created_at: string;
 }
 
+
 export function AreasTab() {
     const [areas, setAreas] = useState<Area[]>([]);
     const [newAreaName, setNewAreaName] = useState("");
