@@ -59,8 +59,7 @@ export default function AdminLogin() {
             const { error } = await supabase.auth.signInWithOtp({
                 email,
                 options: {
-                    shouldCreateUser: false,
-                    emailRedirectTo: `${window.location.origin}/admin/dashboard`
+                    shouldCreateUser: false
                 }
             });
 

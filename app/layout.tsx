@@ -15,6 +15,9 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Sugerencias de Mantenimiento - Barrio",
   description: "Plataforma de sugerencias y reportes para el barrio.",
+  icons: {
+    icon: '/Logo.svg',
+  },
 };
 
 export default function RootLayout({

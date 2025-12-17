@@ -106,7 +106,7 @@ export function UsersTab() {
                             required
                             value={inviteEmail}
                             onChange={(e) => setInviteEmail(e.target.value)}
-                            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
+                            className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-900 outline-none focus:ring-2 focus:ring-blue-100 focus:border-blue-500"
                             placeholder="usuario@ejemplo.com"
                         />
                         <p className="text-xs text-gray-500">Se invitará como <strong>Visor</strong> por defecto.</p>
